@@ -1,0 +1,37 @@
+/* Basic resets and background */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: sans-serif;
+}
+
+/* Style for the host buttons and the audience comment input */
+#spotlightBtn,
+#startBtn,
+#commentInput {
+  position: absolute;
+  z-index: 10;
+  padding: 10px 15px;
+  font-size: 16px;
+}
+
+/* Position the Spotlight button at top left */
+#spotlightBtn {
+  top: 20px;
+  left: 20px;
+}
+
+/* Position the Start button next to it */
+#startBtn {
+  top: 20px;
+  left: 180px;
+}
+
+/* Put the comment input at bottom left */
+#commentInput {
+  bottom: 20px;
+  left: 20px;
+  width: 300px;
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Blind Presenter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Link to our CSS -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- p5.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
+    <!-- p5.party library -->
+    <script src="https://cdn.jsdelivr.net/npm/p5.party@latest/dist/p5.party.js"></script>
+  </head>
+  <body>
+    <!-- Host controls -->
+    <button id="spotlightBtn">Turn On Spotlight</button>
+    <button id="startBtn" style="display: none">Start Presentation</button>
+
+    <!-- Audience control: comment input -->
+    <input
+      type="text"
+      id="commentInput"
+      placeholder="Enter comment"
+      style="display: none"
+    />
+
+    <!-- The p5 canvas is created automatically -->
+    <script src="sketch.js"></script>
+  </body>
+</html>
