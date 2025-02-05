@@ -28,6 +28,7 @@ const slides = [
 
 // Add preloaded images array
 let slideImages = [];
+let audienceVideoImg; // NEW global variable
 
 function preload() {
   // Connect to p5.party server
@@ -75,9 +76,20 @@ function setup() {
   if (isHost) {
     spotlightBtn.mousePressed(() => {
       capture = createCapture(VIDEO);
+      // Set a lower resolution to reduce processing load and delay:
+      capture.size(150, 150);
       capture.hide();
       spotlightOn = true;
       shared.spotlightOn = true; // Share the spotlight state
+
+      // Start sending snapshots every 3 seconds
+      setInterval(() => {
+        if (capture) {
+          capture.loadPixels();
+          shared.videoData = capture.canvas.toDataURL();
+          console.log("Host snapshot:", shared.videoData);
+        }
+      }, 3000);
 
       // Show start button if audience exists
       if (shared.audienceCount > 0) {
@@ -101,13 +113,19 @@ function draw() {
   // Draw video if spotlight is on
   if (shared.spotlightOn) {
     if (isHost && capture) {
-      // Host sees their own video
+      // Host draws their own live capture (snapshot updates via timer)
       drawHostVideo(capture);
-      // Share video data with audience
-      shared.videoData = capture.canvas;
     } else if (shared.videoData) {
-      // Audience sees host's video when the spotlight is on
-      drawHostVideo(shared.videoData);
+      // Audience: update or create image element from the host video dataURL
+      if (!audienceVideoImg) {
+        audienceVideoImg = createImg(shared.videoData, "video");
+        audienceVideoImg.hide();
+      } else if (audienceVideoImg.elt.src !== shared.videoData) {
+        audienceVideoImg.elt.src = shared.videoData;
+      }
+      // Log active audience frame (data URL)
+      console.log("Audience active frame:", audienceVideoImg.elt.src);
+      drawHostVideo(audienceVideoImg);
     }
   }
 
