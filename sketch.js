@@ -77,6 +77,7 @@ function setup() {
       capture = createCapture(VIDEO);
       capture.hide();
       spotlightOn = true;
+      shared.spotlightOn = true; // Share the spotlight state
 
       // Show start button if audience exists
       if (shared.audienceCount > 0) {
@@ -98,14 +99,16 @@ function draw() {
   drawSlide();
 
   // Draw video if spotlight is on
-  if (isHost && spotlightOn) {
-    drawHostVideo();
-  }
-
-  if (!isHost && shared.presentationStarted) {
-    // Draw host video for audience
-    // Note: In a real implementation, you'd need to handle video streaming
-    // between clients, which requires additional infrastructure
+  if (shared.spotlightOn) {
+    if (isHost && capture) {
+      // Host sees their own video
+      drawHostVideo(capture);
+      // Share video data with audience
+      shared.videoData = capture.canvas;
+    } else if (shared.videoData) {
+      // Audience sees host's video when the spotlight is on
+      drawHostVideo(shared.videoData);
+    }
   }
 
   // Draw audience count
@@ -153,30 +156,33 @@ function drawSlide() {
   }
 }
 
-function drawHostVideo() {
-  if (capture) {
-    const size = 150;
-    const x = width - size - 20;
-    const y = height - size - 20;
+function drawHostVideo(videoSource) {
+  const size = 150;
+  const x = width - size - 20;
+  const y = height - size - 20;
 
-    // Draw circular video
-    push();
-    imageMode(CENTER);
-    translate(x + size / 2, y + size / 2);
-    image(capture, 0, 0, size, size);
-    pop();
-  }
+  // Draw circular video
+  push();
+  imageMode(CENTER);
+  translate(x + size / 2, y + size / 2);
+  image(videoSource, 0, 0, size, size);
+  pop();
 }
 
 function setupAudienceControls() {
   const commentInput = select("#commentInput");
   commentInput.style("display", "block");
 
-  commentInput.input(() => {
-    if (keyCode === ENTER && commentInput.value().trim() !== "") {
+  commentInput.elt.addEventListener("keydown", (e) => {
+    // Check for enter key and non-empty input
+    if (e.key === "Enter" && commentInput.value().trim() !== "") {
+      e.preventDefault();
+      // Add fixed x and starting y properties
       shared.comments.push({
         text: commentInput.value(),
         timestamp: Date.now(),
+        x: random(50, width - 50), // fixed x position
+        startY: height - 50, // starting y position at bottom
       });
       commentInput.value("");
     }
@@ -184,13 +190,16 @@ function setupAudienceControls() {
 }
 
 function drawComments() {
-  // Draw floating comments
+  // Draw and animate floating comments upward
   shared.comments.forEach((comment, i) => {
     const age = (Date.now() - comment.timestamp) / 1000;
     if (age < 5) {
-      // Show comments for 5 seconds
+      // Calculate upward movement; velocity: 30 pixels per second
+      const y = comment.startY - age * 30;
       fill(255, 255, 255, 255 * (1 - age / 5));
-      text(comment.text, random(width), random(height));
+      drawingContext.shadowBlur = 4;
+      drawingContext.shadowColor = "black";
+      text(comment.text, comment.x, y);
     } else {
       shared.comments.splice(i, 1);
     }

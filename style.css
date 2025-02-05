@@ -19,13 +19,13 @@ body {
 
 /* Position the Spotlight button at top left */
 #spotlightBtn {
-  top: 20px;
+  bottom: 20px;
   left: 20px;
 }
 
 /* Position the Start button next to it */
 #startBtn {
-  top: 20px;
+  bottom: 20px;
   left: 180px;
 }
 
